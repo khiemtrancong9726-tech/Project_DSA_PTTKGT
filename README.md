@@ -13,7 +13,7 @@ So sánh hiệu năng các thuật toán tìm kiếm (Hash Table, Linear Search,
 
 ### 1. Clone repo
 ```bash
-git clone https://github.com/khiemtrancong9726-tech/Project_DSA_PTTKGT.git
+git clone https://github.com/khiemtrancong26-tech/Project_DSA_PTTKGT.git
 cd Project_DSA_PTTKGT
 ```
 
