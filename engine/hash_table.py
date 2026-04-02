@@ -1,10 +1,5 @@
 # engine/hash_table.py
 
-# Sentinel dùng cho Open Addressing — phân biệt "chưa có" vs "đã xóa"
-# Đặt ở module level để chaining.py và open_addressing.py đều import được
-DELETED = object()
-
-
 class HashTable:
     """
     Base class — định nghĩa interface chung cho mọi loại hash table.
@@ -41,9 +36,6 @@ class HashTable:
     def search(self, key: str):
         raise NotImplementedError
 
-    def delete(self, key: str):
-        raise NotImplementedError
-
     # ---- Thông tin trạng thái ----
 
     def load_factor(self) -> float:
@@ -53,6 +45,3 @@ class HashTable:
         Dùng trong load factor experiment của Scenario 1.
         """
         return self.count / self.size
-
-    def __len__(self) -> int:
-        return self.count

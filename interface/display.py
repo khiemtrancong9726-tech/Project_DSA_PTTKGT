@@ -16,12 +16,7 @@ from rich         import box
 
 console = Console()
 
-C_WINNER  = "bold green"
-C_SLOWEST = "bold red"
-C_FAILED  = "bold red"
-C_NOTE    = "yellow"
-C_DIM     = "dim white"
-C_WHITE   = "white"
+C_FAILED = "bold red"
 
 
 # ══════════════════════════════════════════════════════════════════
@@ -32,11 +27,6 @@ def fmt_ms(ms: float) -> str:
     if ms is None:
         return "—"
     return f"{ms:.6f} ms"
-
-def _section(title: str):
-    console.print()
-    console.rule(f"[bold cyan]{title}[/bold cyan]")
-    console.print()
 
 
 def _found_row(found: dict, target_id: str):
@@ -82,6 +72,15 @@ def _matches_table(matches: list, match_count: int):
 #  SCENARIO 1 — Tra cứu theo MSSV
 # ══════════════════════════════════════════════════════════════════
 
+def display_banner():
+    banner = Text()
+    banner.append("HashIndex", style="bold cyan")
+    banner.append(" — So sánh Hash Table với Linear & Binary Search", style="white")
+    banner.append("\nBài toán: Hệ thống quản lý sinh viên đại học · 3 Scenario", style="dim")
+    console.print(Panel(banner, box=box.DOUBLE, padding=(0, 2)))
+    console.print()
+
+
 def display_s1_single(result: dict, target_id: str):
     """In kết quả 1 thuật toán Scenario 1."""
     console.print()
@@ -96,21 +95,6 @@ def display_s1_single(result: dict, target_id: str):
         console.print(f"  [dim]  (+ sort: {fmt_ms(result['sort_ms'])} → tổng: {fmt_ms(result['ms'] + result['sort_ms'])})[/dim]")
 
     _found_row(result["found"], target_id)
-
-
-def display_banner():
-    banner = Text()
-    banner.append("HashIndex", style="bold cyan")
-    banner.append(" — So sánh Hash Table với Linear & Binary Search", style="white")
-    banner.append("\nBài toán: Hệ thống quản lý sinh viên đại học · 3 Scenario", style="dim")
-    console.print(Panel(banner, box=box.DOUBLE, padding=(0, 2)))
-    console.print()
-
-
-# ── Giữ lại tên cũ để không break import nào khác ──
-def display_scenario1(result): pass
-def display_scenario2(result): pass
-def display_scenario4(result): pass
 
 
 # ══════════════════════════════════════════════════════════════════

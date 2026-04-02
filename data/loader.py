@@ -72,45 +72,6 @@ def _validate_columns(df: "pd.DataFrame", path: Path):
             f"File {path.name} thiếu cột: {', '.join(sorted(missing))}"
         )
 
-
-# ══════════════════════════════════════════════════════════════════
-#  Load nhiều file cùng lúc
-# ══════════════════════════════════════════════════════════════════
-
-def load_all(data_dir: str | Path = "data") -> dict:
-    """
-    Load cả 3 file dataset, trả về dict theo key kích thước.
-
-    Args:
-        data_dir : str | Path — thư mục chứa file xlsx
-
-    Returns:
-        dict:
-            "1K"  → list[dict] — 1,000 records
-            "5K"  → list[dict] — 5,000 records
-            "10K" → list[dict] — 10,000 records
-
-    Bỏ qua file nào không tìm thấy — không raise error,
-    chỉ in cảnh báo để không crash khi chạy với subset file.
-    """
-    base = Path(data_dir)
-    targets = {
-        "1K":  base / "students_1K.xlsx",
-        "5K":  base / "students_5K.xlsx",
-        "10K": base / "students_10K.xlsx",
-    }
-
-    result = {}
-    for label, path in targets.items():
-        try:
-            result[label] = load_xlsx(path)
-            print(f"✅ Loaded {label}: {len(result[label]):,} records ← {path.name}")
-        except FileNotFoundError:
-            print(f"⚠️  Không tìm thấy {path.name} — bỏ qua.")
-
-    return result
-
-
 # ══════════════════════════════════════════════════════════════════
 #  Build hash tables từ records
 # ══════════════════════════════════════════════════════════════════

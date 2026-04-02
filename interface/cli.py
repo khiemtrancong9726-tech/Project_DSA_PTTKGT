@@ -53,7 +53,6 @@ DATASET_LABELS = {
 }
 
 DEFAULT_DEPARTMENT = "CNTT"
-DEFAULT_MIN_GPA    = 3.5
 DEFAULT_QUERY      = "Văn An"
 
 
@@ -130,7 +129,6 @@ def _run_scenario1(records: list, ht_chain, ht_open):
         target_id = suggest_id
 
     n = len(records)
-    # collected: lưu kết quả từng thuật toán đã chạy
     collected = {"chain": None, "open": None, "linear": None, "binary": None}
 
     while True:
@@ -146,25 +144,21 @@ def _run_scenario1(records: list, ht_chain, ht_open):
 
         if choice == "0":
             break
-
         elif choice == "1":
             with _spinner("Đang chạy Hash Chaining (100 lần)"):
                 r = bench_s1_chain(ht_chain, target_id)
             collected["chain"] = r
             display_s1_single(r, target_id)
-
         elif choice == "2":
             with _spinner("Đang chạy Hash Open Addressing (100 lần)"):
                 r = bench_s1_open(ht_open, target_id)
             collected["open"] = r
             display_s1_single(r, target_id)
-
         elif choice == "3":
             with _spinner("Đang chạy Linear Search (100 lần)"):
                 r = bench_s1_linear(records, target_id)
             collected["linear"] = r
             display_s1_single(r, target_id)
-
         elif choice == "4":
             with _spinner("Đang chạy Binary Search (100 lần)"):
                 r = bench_s1_binary(records, target_id)
@@ -179,7 +173,6 @@ def _run_scenario1(records: list, ht_chain, ht_open):
 def _run_scenario2(records: list):
     n = len(records)
 
-    # Chọn kiểu lọc
     console.print("\n  [bold cyan]SCENARIO 2 — Chọn kiểu lọc:[/bold cyan]")
     console.print("    [1] Khoảng GPA + Mã khoa       (Hash wins một phần)")
     console.print("    [2] Khoảng GPA                 (Hash FAILED, Binary wins)")
@@ -209,7 +202,7 @@ def _run_scenario2a(records: list, n: int):
         return
 
     params    = {"department": dept, "min_gpa": min_gpa, "max_gpa": max_gpa}
-    collected   = {"hash": None, "linear": None, "binary": None}
+    collected = {"hash": None, "linear": None, "binary": None}
 
     while True:
         console.print(f"\n  [bold cyan]SCENARIO 2A · {dept} · GPA {min_gpa}→{max_gpa} · {n:,} records[/bold cyan]")
@@ -223,19 +216,16 @@ def _run_scenario2a(records: list, n: int):
 
         if choice == "0":
             break
-
         elif choice == "1":
             with _spinner("Đang chạy Composite Hash (100 lần)"):
                 r = bench_s2a_hash(records, dept, min_gpa, max_gpa)
             collected["hash"] = r
             display_s2_single(r, "2A", params)
-
         elif choice == "2":
             with _spinner("Đang chạy Linear Scan (100 lần)"):
                 r = bench_s2a_linear(records, dept, min_gpa, max_gpa)
             collected["linear"] = r
             display_s2_single(r, "2A", params)
-
         elif choice == "3":
             with _spinner("Đang chạy Binary Filter (100 lần)"):
                 r = bench_s2a_binary(records, dept, min_gpa, max_gpa)
@@ -267,18 +257,15 @@ def _run_scenario2b(records: list, n: int):
 
         if choice == "0":
             break
-
         elif choice == "1":
             r = bench_s2b_hash(min_gpa, max_gpa)
             collected["hash"] = r
             display_s2_single(r, "2B", params)
-
         elif choice == "2":
             with _spinner("Đang chạy Linear Scan (100 lần)"):
                 r = bench_s2b_linear(records, min_gpa, max_gpa)
             collected["linear"] = r
             display_s2_single(r, "2B", params)
-
         elif choice == "3":
             with _spinner("Đang chạy Binary Filter (100 lần)"):
                 r = bench_s2b_binary(records, min_gpa, max_gpa)
@@ -308,12 +295,10 @@ def _run_scenario3(records: list, ht_chain):
 
         if choice == "0":
             break
-
         elif choice == "1":
             r = bench_s3_hash(ht_chain, query)
             collected["hash"] = r
             display_s3_single(r, query)
-
         elif choice == "2":
             with _spinner(f'Đang chạy Fuzzy Search "{query}" (100 lần)'):
                 r = bench_s3_fuzzy(records, query)

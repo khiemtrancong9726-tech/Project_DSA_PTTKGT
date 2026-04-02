@@ -14,13 +14,8 @@ không có bất kỳ logic in ấn nào ở đây (Separation of Concerns).
 import time
 import bisect
 
-from engine.collision.chaining        import ChainingHashTable
-from engine.collision.open_addressing import OpenAddressingHashTable
 from engine.search import (
     linear_search,
-    binary_search_full,
-    linear_filter,
-    binary_filter,
     sort_by_id,
     sort_by_gpa,
     binary_search,
@@ -42,31 +37,6 @@ def _avg_ms(fn, repeat: int = REPEAT) -> float:
         fn()
         total += time.perf_counter() - start
     return (total / repeat) * 1000
-
-
-def _build_hash(records: list, size: int = None) -> tuple:
-    n = len(records)
-    table_size = size if size is not None else _next_prime(n * 2)
-    start = time.perf_counter()
-    ht_chain = ChainingHashTable(size=table_size)
-    ht_open  = OpenAddressingHashTable(size=table_size)
-    for r in records:
-        key = r["student_id"]
-        ht_chain.insert(key, r)
-        ht_open.insert(key, r)
-    build_ms = (time.perf_counter() - start) * 1000
-    return ht_chain, ht_open, build_ms
-
-
-def _next_prime(n: int) -> int:
-    def is_prime(x):
-        if x < 2: return False
-        for i in range(2, int(x**0.5) + 1):
-            if x % i == 0: return False
-        return True
-    while not is_prime(n):
-        n += 1
-    return n
 
 
 def _build_dept_index(records: list) -> dict:
@@ -141,34 +111,13 @@ def bench_s1_binary(records: list, target_id: str) -> dict:
     }
 
 
-# ── Load factor experiment (dùng trong compare all S1) ──
-
-def _load_factor_experiment(records: list, target_id: str) -> list:
-    n      = len(records)
-    alphas = [0.3, 0.5, 0.7, 0.9]
-    result = []
-    for alpha in alphas:
-        table_size = max(int(n / alpha), n + 1)
-        ht = ChainingHashTable(size=table_size)
-        for r in records:
-            ht.insert(r["student_id"], r)
-        lookup_ms = _avg_ms(lambda: ht.search(target_id))
-        result.append({
-            "alpha":      alpha,
-            "table_size": table_size,
-            "actual_lf":  round(ht.load_factor(), 3),
-            "lookup_ms":  lookup_ms,
-        })
-    return result
-
-
 # ══════════════════════════════════════════════════════════════════
 #  SCENARIO 2A — Lọc GPA + Department — từng thuật toán riêng
 # ══════════════════════════════════════════════════════════════════
 
 def bench_s2a_hash(records: list, department: str, min_gpa: float, max_gpa: float) -> dict:
     """Composite Hash — bucket theo department, filter khoảng GPA trong bucket."""
-    dept_index   = _build_dept_index(records)
+    dept_index = _build_dept_index(records)
     def _filter(): return _composite_filter(dept_index, department, min_gpa, max_gpa)
     ms      = _avg_ms(_filter)
     matches = _filter()
@@ -299,40 +248,4 @@ def bench_s3_fuzzy(records: list, query: str) -> dict:
         "match_count": len(matches),
         "matches":     matches,
         "failed":      False,
-    }
-
-
-# ══════════════════════════════════════════════════════════════════
-#  Hàm cũ — giữ lại để không break import nào khác
-# ══════════════════════════════════════════════════════════════════
-
-def benchmark_scenario1(records: list, target_id: str) -> dict:
-    ht_chain, ht_open, build_ms = _build_hash(records)
-    return {
-        **bench_s1_all(records, ht_chain, ht_open, target_id),
-        "build_ms": build_ms,
-    }
-
-
-def benchmark_scenario2(records, department, min_gpa):
-    return {
-        "n":            len(records),
-        "department":   department,
-        "min_gpa":      min_gpa,
-        **{k: v for k, v in bench_s2a_hash(records, department, min_gpa).items()
-           if k not in ("algo", "failed")},
-        "composite_ms": bench_s2a_hash(records, department, min_gpa)["ms"],
-        "linear_ms":    bench_s2a_linear(records, department, min_gpa)["ms"],
-        **{f"binary_{k}": v for k, v in bench_s2a_binary(records, department, min_gpa).items()
-           if k in ("ms", "sort_ms")},
-    }
-
-
-def benchmark_scenario4(records, hash_table, query):
-    return {
-        "n":           len(records),
-        "query":       query,
-        "hash_failed": True,
-        **{k: v for k, v in bench_s3_fuzzy(records, query).items()
-           if k != "algo"},
     }

@@ -13,7 +13,6 @@ class ChainingHashTable(HashTable):
     Complexity:
         insert : O(1) avg — append vào đầu list
         search : O(1) avg / O(n) worst — duyệt list trong bucket
-        delete : O(1) avg / O(n) worst — duyệt list để tìm rồi xóa
 
     Worst case xảy ra khi tất cả key hash về cùng 1 bucket (α → ∞).
     Với load factor α ≤ 0.7, chain trung bình ≈ 1–2 phần tử → gần O(1).
@@ -60,23 +59,6 @@ class ChainingHashTable(HashTable):
 
         return None   # không tìm thấy
 
-    # ---- delete ----
-
-    def delete(self, key: str) -> bool:
-        """
-        Xóa phần tử theo key.
-        Trả về True nếu xóa thành công, False nếu key không tồn tại.
-        """
-        idx = self._hash(key)
-        chain = self.table[idx]
-
-        for i, (k, v) in enumerate(chain):
-            if k == key:
-                chain.pop(i)
-                self.count -= 1
-                return True
-
-        return False   # key không tồn tại
 
     # ---- debug helper ----
 
