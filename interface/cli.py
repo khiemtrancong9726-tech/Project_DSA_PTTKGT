@@ -17,10 +17,8 @@ from rich.console  import Console
 from rich.prompt   import Prompt
 from rich.progress import Progress, SpinnerColumn, TextColumn
 
-# Layer 1
 from data.loader import load_xlsx, build_hash_tables, sample_id
 
-# Layer 2
 from engine.benchmark import (
     bench_s1_chain, bench_s1_open, bench_s1_linear, bench_s1_binary,
     bench_s2a_hash, bench_s2a_linear, bench_s2a_binary,
@@ -28,7 +26,6 @@ from engine.benchmark import (
     bench_s3_hash, bench_s3_fuzzy,
 )
 
-# Layer 3
 from interface.display import (
     display_banner,
     display_s1_single,
@@ -128,7 +125,7 @@ def _run_scenario1(records: list, ht_chain, ht_open):
         console.print(f"  [red]MSSV không tồn tại — dùng gợi ý thay thế.[/red]")
         target_id = suggest_id
 
-    n = len(records)
+    n         = len(records)
     collected = {"chain": None, "open": None, "linear": None, "binary": None}
 
     while True:
@@ -145,22 +142,22 @@ def _run_scenario1(records: list, ht_chain, ht_open):
         if choice == "0":
             break
         elif choice == "1":
-            with _spinner("Đang chạy Hash Chaining (100 lần)"):
+            with _spinner("Đang chạy Hash Chaining (20 lần)"):
                 r = bench_s1_chain(ht_chain, target_id)
             collected["chain"] = r
             display_s1_single(r, target_id)
         elif choice == "2":
-            with _spinner("Đang chạy Hash Open Addressing (100 lần)"):
+            with _spinner("Đang chạy Hash Open Addressing (20 lần)"):
                 r = bench_s1_open(ht_open, target_id)
             collected["open"] = r
             display_s1_single(r, target_id)
         elif choice == "3":
-            with _spinner("Đang chạy Linear Search (100 lần)"):
+            with _spinner("Đang chạy Linear Search (20 lần)"):
                 r = bench_s1_linear(records, target_id)
             collected["linear"] = r
             display_s1_single(r, target_id)
         elif choice == "4":
-            with _spinner("Đang chạy Binary Search (100 lần)"):
+            with _spinner("Đang chạy Binary Search (20 lần)"):
                 r = bench_s1_binary(records, target_id)
             collected["binary"] = r
             display_s1_single(r, target_id)
@@ -189,7 +186,6 @@ def _run_scenario2(records: list):
 
 
 def _run_scenario2a(records: list, n: int):
-    """GPA tối thiểu + Department."""
     dept    = Prompt.ask(
         "  Mã khoa (CNTT / KHDL / HTTT / ATTT / KHMT)",
         default=DEFAULT_DEPARTMENT,
@@ -201,7 +197,6 @@ def _run_scenario2a(records: list, n: int):
         console.print("  [red]GPA tối thiểu phải nhỏ hơn tối đa.[/red]")
         return
 
-    params    = {"department": dept, "min_gpa": min_gpa, "max_gpa": max_gpa}
     collected = {"hash": None, "linear": None, "binary": None}
 
     while True:
@@ -217,24 +212,23 @@ def _run_scenario2a(records: list, n: int):
         if choice == "0":
             break
         elif choice == "1":
-            with _spinner("Đang chạy Composite Hash (100 lần)"):
+            with _spinner("Đang chạy Composite Hash (20 lần)"):
                 r = bench_s2a_hash(records, dept, min_gpa, max_gpa)
             collected["hash"] = r
-            display_s2_single(r, "2A", params)
+            display_s2_single(r)
         elif choice == "2":
-            with _spinner("Đang chạy Linear Scan (100 lần)"):
+            with _spinner("Đang chạy Linear Scan (20 lần)"):
                 r = bench_s2a_linear(records, dept, min_gpa, max_gpa)
             collected["linear"] = r
-            display_s2_single(r, "2A", params)
+            display_s2_single(r)
         elif choice == "3":
-            with _spinner("Đang chạy Binary Filter (100 lần)"):
+            with _spinner("Đang chạy Binary Filter (20 lần)"):
                 r = bench_s2a_binary(records, dept, min_gpa, max_gpa)
             collected["binary"] = r
-            display_s2_single(r, "2A", params)
+            display_s2_single(r)
 
 
 def _run_scenario2b(records: list, n: int):
-    """Khoảng GPA — Hash FAILED, Binary wins."""
     min_gpa = float(Prompt.ask("  GPA tối thiểu (vd: 3.2)", default="3.2"))
     max_gpa = float(Prompt.ask("  GPA tối đa   (vd: 3.7)", default="3.7"))
 
@@ -242,7 +236,6 @@ def _run_scenario2b(records: list, n: int):
         console.print("  [red]GPA tối thiểu phải nhỏ hơn tối đa.[/red]")
         return
 
-    params    = {"min_gpa": min_gpa, "max_gpa": max_gpa}
     collected = {"hash": None, "linear": None, "binary": None}
 
     while True:
@@ -260,17 +253,17 @@ def _run_scenario2b(records: list, n: int):
         elif choice == "1":
             r = bench_s2b_hash(min_gpa, max_gpa)
             collected["hash"] = r
-            display_s2_single(r, "2B", params)
+            display_s2_single(r)
         elif choice == "2":
-            with _spinner("Đang chạy Linear Scan (100 lần)"):
+            with _spinner("Đang chạy Linear Scan (20 lần)"):
                 r = bench_s2b_linear(records, min_gpa, max_gpa)
             collected["linear"] = r
-            display_s2_single(r, "2B", params)
+            display_s2_single(r)
         elif choice == "3":
-            with _spinner("Đang chạy Binary Filter (100 lần)"):
+            with _spinner("Đang chạy Binary Filter (20 lần)"):
                 r = bench_s2b_binary(records, min_gpa, max_gpa)
             collected["binary"] = r
-            display_s2_single(r, "2B", params)
+            display_s2_single(r)
 
 
 # ══════════════════════════════════════════════════════════════════
@@ -298,12 +291,12 @@ def _run_scenario3(records: list, ht_chain):
         elif choice == "1":
             r = bench_s3_hash(ht_chain, query)
             collected["hash"] = r
-            display_s3_single(r, query)
+            display_s3_single(r)
         elif choice == "2":
-            with _spinner(f'Đang chạy Fuzzy Search "{query}" (100 lần)'):
+            with _spinner(f'Đang chạy Fuzzy Search "{query}" (20 lần)'):
                 r = bench_s3_fuzzy(records, query)
             collected["fuzzy"] = r
-            display_s3_single(r, query)
+            display_s3_single(r)
 
 
 # ══════════════════════════════════════════════════════════════════
@@ -326,7 +319,7 @@ def main():
     console.print(
         f"  ✅ Hash tables built — "
         f"size: [green]{ht_chain.size:,}[/green]  "
-        f"load factor: [green]{ht_chain.load_factor():.2f}[/green]"
+        f"load factor: [green]{ht_chain.count / ht_chain.size:.2f}[/green]"
     )
 
     while True:

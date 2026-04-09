@@ -1,9 +1,11 @@
 # data/loader.py
 """
-Layer 1 — đọc file xlsx, trả về list[dict] chuẩn cho engine dùng.
+Layer 1 — chuẩn bị dữ liệu cho engine.
 
-Nhiệm vụ duy nhất: I/O và type conversion.
-Không có logic thuật toán ở đây — đúng Separation of Concerns.
+Gồm 3 nhóm chức năng:
+    1. load_xlsx         — đọc file xlsx, trả về list[dict]
+    2. build_hash_tables — khởi tạo Chaining và Open Addressing từ records
+    3. sample_id         — lấy student_id mẫu để benchmark reproducible
 
 Schema đọc ra — 7 cột:
     student_id      : str   (giữ nguyên string — leading zero quan trọng)
@@ -20,7 +22,7 @@ from pathlib import Path
 
 
 # ══════════════════════════════════════════════════════════════════
-#  Load file xlsx → list[dict]
+#  1. Load file xlsx → list[dict]
 # ══════════════════════════════════════════════════════════════════
 
 def load_xlsx(filepath: str | Path) -> list:
@@ -29,31 +31,19 @@ def load_xlsx(filepath: str | Path) -> list:
 
     student_id đọc ra kiểu str — KHÔNG để pandas tự convert sang int
     vì CCCD có leading zero (079...) sẽ bị mất.
-
-    Args:
-        filepath : str | Path — đường dẫn đến file xlsx
-
-    Returns:
-        list[dict] — mỗi dict có đúng 7 key theo schema ở trên
-
-    Raises:
-        FileNotFoundError — nếu file không tồn tại
-        ValueError        — nếu file thiếu cột bắt buộc
     """
     path = Path(filepath)
     if not path.exists():
         raise FileNotFoundError(f"Không tìm thấy file: {path}")
 
-    # dtype=str cho student_id — giữ leading zero
     df = pd.read_excel(
         path,
-        dtype={"student_id": str},
+        dtype={"student_id": str},  # giữ leading zero
         engine="openpyxl",
     )
 
     _validate_columns(df, path)
 
-    # Ép kiểu rõ ràng — không tin pandas tự infer
     df["gpa"]        = df["gpa"].astype(float).round(2)
     df["birth_year"] = df["birth_year"].astype(int)
 
@@ -61,7 +51,6 @@ def load_xlsx(filepath: str | Path) -> list:
 
 
 def _validate_columns(df: "pd.DataFrame", path: Path):
-    """Kiểm tra đủ 7 cột bắt buộc — raise ValueError nếu thiếu."""
     required = {
         "student_id", "name", "gpa",
         "department_code", "province_name", "gender", "birth_year",
@@ -72,30 +61,16 @@ def _validate_columns(df: "pd.DataFrame", path: Path):
             f"File {path.name} thiếu cột: {', '.join(sorted(missing))}"
         )
 
+
 # ══════════════════════════════════════════════════════════════════
-#  Build hash tables từ records
+#  2. Build hash tables từ records
 # ══════════════════════════════════════════════════════════════════
 
 def build_hash_tables(records: list, load_factor: float = 0.5) -> tuple:
-    """
-    Build ChainingHashTable và OpenAddressingHashTable từ records.
-
-    Table size = n / load_factor → đảm bảo α ≈ load_factor sau khi insert.
-    Dùng số nguyên tố gần nhất để giảm collision.
-
-    Args:
-        records     : list[dict]
-        load_factor : float — load factor mục tiêu (default 0.5)
-
-    Returns:
-        (ChainingHashTable, OpenAddressingHashTable)
-    """
     from engine.collision.chaining        import ChainingHashTable
     from engine.collision.open_addressing import OpenAddressingHashTable
 
-    n    = len(records)
-    size = _next_prime(int(n / load_factor))
-
+    size     = _next_prime(int(len(records) / load_factor))
     ht_chain = ChainingHashTable(size=size)
     ht_open  = OpenAddressingHashTable(size=size)
 
@@ -108,7 +83,6 @@ def build_hash_tables(records: list, load_factor: float = 0.5) -> tuple:
 
 
 def _next_prime(n: int) -> int:
-    """Số nguyên tố nhỏ nhất >= n."""
     def is_prime(x):
         if x < 2:
             return False
@@ -123,22 +97,9 @@ def _next_prime(n: int) -> int:
 
 
 # ══════════════════════════════════════════════════════════════════
-#  Tiện ích — lấy 1 student_id ngẫu nhiên để benchmark
+#  3. Tiện ích benchmark
 # ══════════════════════════════════════════════════════════════════
 
 def sample_id(records: list, index: int = 500) -> str:
-    """
-    Lấy student_id tại vị trí index — dùng làm target_id cho benchmark.
-
-    Không random để benchmark reproducible giữa các lần chạy.
-    Default index=500 → lấy record giữa danh sách, tránh best-case (index=0).
-
-    Args:
-        records : list[dict]
-        index   : int — vị trí lấy (default 500)
-
-    Returns:
-        str — student_id
-    """
-    idx = min(index, len(records) - 1)
-    return records[idx]["student_id"]
+    """Lấy student_id tại vị trí index — reproducible, tránh best-case (index=0)."""
+    return records[min(index, len(records) - 1)]["student_id"]

@@ -4,8 +4,7 @@ Layer 3 — Render kết quả benchmark ra terminal dùng thư viện rich.
 
 Nguyên tắc:
     - Không có logic thuật toán ở đây — chỉ nhận dict từ benchmark.py rồi in.
-    - Màu sắc nhất quán: xanh lá = WINNER, đỏ = FAILED/SLOWEST, vàng = kết luận.
-    - Không dùng bar chart — kết quả số liệu đứng độc lập, rõ ràng hơn.
+    - Màu sắc nhất quán: xanh lá = WINNER, đỏ = FAILED/SLOWEST.
 """
 
 from rich.console import Console
@@ -30,7 +29,6 @@ def fmt_ms(ms: float) -> str:
 
 
 def _found_row(found: dict, target_id: str):
-    """In thông tin sinh viên tìm được."""
     if found:
         console.print(f"  [bold]Sinh viên tìm được:[/bold]")
         console.print(
@@ -44,7 +42,6 @@ def _found_row(found: dict, target_id: str):
 
 
 def _matches_table(matches: list, match_count: int):
-    """In bảng kết quả lọc (tối đa 10 dòng)."""
     if not matches:
         console.print("  [red]Không tìm thấy kết quả nào.[/red]")
         return
@@ -82,14 +79,12 @@ def display_banner():
 
 
 def display_s1_single(result: dict, target_id: str):
-    """In kết quả 1 thuật toán Scenario 1."""
     console.print()
     if result["failed"]:
         console.print(f"  [{C_FAILED}]{result['algo']}[/{C_FAILED}]  →  FAILED")
         return
 
-    ms_str = fmt_ms(result["ms"])
-    console.print(f"  [green]{result['algo']}[/green]  →  [green]{ms_str}[/green]")
+    console.print(f"  [green]{result['algo']}[/green]  →  [green]{fmt_ms(result['ms'])}[/green]")
 
     if result["sort_ms"] is not None:
         console.print(f"  [dim]  (+ sort: {fmt_ms(result['sort_ms'])} → tổng: {fmt_ms(result['ms'] + result['sort_ms'])})[/dim]")
@@ -101,7 +96,7 @@ def display_s1_single(result: dict, target_id: str):
 #  SCENARIO 2 — Lọc đa điều kiện
 # ══════════════════════════════════════════════════════════════════
 
-def display_s2_single(result: dict, filter_type: str, params: dict):
+def display_s2_single(result: dict):
     console.print()
     if result["failed"]:
         console.print(f"  [{C_FAILED}]{result['algo']}[/{C_FAILED}]  →  [red]FAILED[/red]")
@@ -118,7 +113,7 @@ def display_s2_single(result: dict, filter_type: str, params: dict):
 #  SCENARIO 3 — Tìm tên mờ
 # ══════════════════════════════════════════════════════════════════
 
-def display_s3_single(result: dict, query: str):
+def display_s3_single(result: dict):
     console.print()
     if result["failed"]:
         console.print(f"  [{C_FAILED}]{result['algo']}[/{C_FAILED}]  →  [red]FAILED[/red]")

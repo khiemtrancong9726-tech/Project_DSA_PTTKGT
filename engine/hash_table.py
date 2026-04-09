@@ -37,11 +37,3 @@ class HashTable:
         raise NotImplementedError
 
     # ---- Thông tin trạng thái ----
-
-    def load_factor(self) -> float:
-        """
-        Tỉ lệ phần tử / kích thước bảng.
-        α > 0.7 → collision tăng mạnh → lookup bắt đầu degradation.
-        Dùng trong load factor experiment của Scenario 1.
-        """
-        return self.count / self.size
