@@ -55,7 +55,7 @@ def api_load_dataset(req: LoadDatasetReq):
     db["ht_chain"] = ht_chain
     db["ht_open"] = ht_open
     
-    suggested = sample_id(records, index=min(50, len(records)-1)) if len(records) > 0 else "SV001"
+    suggested = sample_id(records) if len(records) > 0 else "SV001"
     
     return {"count": len(records), "suggested_id": suggested}
 
