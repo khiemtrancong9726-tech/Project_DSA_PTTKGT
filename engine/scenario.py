@@ -13,12 +13,12 @@ Không tự đo thời gian — đó là việc của benchmark.py.
 """
 
 from engine.benchmark import _avg_ms, _once_ms
-from engine.linear import (
+from engine.linear_search import (
     linear_search,
     linear_filter_dept_gpa,
     linear_filter_gpa,
 )
-from engine.binary import (
+from engine.binary_search import (
     binary_search,
     binary_filter_dept_gpa,
     binary_filter_gpa,
