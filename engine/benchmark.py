@@ -133,10 +133,17 @@ def bench_s2b_binary(records, min_gpa, max_gpa):
 #  SCENARIO 3 — Tìm tên mờ
 # ══════════════════════════════════════════════════════════════════
 
-def bench_s3_hash(ht_chain, query: str) -> dict:
-    return {"algo": "Hash lookup", "ms": None, "match_count": 0, "matches": [], "failed": True}
-
-
 def bench_s3_fuzzy(records: list, query: str) -> dict:
     ms, matches = _avg_ms(lambda: fuzzy_linear_search(records, query))
     return {"algo": "Fuzzy Linear Search", "ms": ms, "match_count": len(matches), "matches": matches, "failed": False}
+
+
+def bench_s3_inverted(inv_index, query: str) -> dict:
+    ms, matches = _avg_ms(lambda: inv_index.search(query))
+    return {
+        "algo": "Inverted Index",
+        "ms": ms,
+        "match_count": len(matches),
+        "matches": matches,
+        "failed": False
+    }

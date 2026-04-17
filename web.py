@@ -13,7 +13,7 @@ from engine.benchmark import (
     bench_s1_chain, bench_s1_open, bench_s1_linear, bench_s1_binary,
     bench_s2a_chain, bench_s2a_open, bench_s2a_linear, bench_s2a_binary,
     bench_s2b_hash, bench_s2b_linear, bench_s2b_binary,
-    bench_s3_hash, bench_s3_fuzzy,
+    bench_s3_fuzzy, bench_s3_inverted,
 )
 
 app = FastAPI(title="DSA Benchmark API")
@@ -42,6 +42,7 @@ db = {
     "ht_open":       None,
     "ht_chain_dept": None,
     "ht_open_dept":  None,
+    "inv_index":     None,  # thêm
 }
 
 class LoadDatasetReq(BaseModel):
@@ -54,13 +55,14 @@ def api_load_dataset(req: LoadDatasetReq):
         raise HTTPException(status_code=400, detail="Invalid dataset size")
 
     records = load_xlsx(DATASET_FILES[size])
-    ht_chain, ht_open, ht_chain_dept, ht_open_dept = build_hash_tables(records)
+    ht_chain, ht_open, ht_chain_dept, ht_open_dept, inv_index = build_hash_tables(records)  # unpack 5
 
     db["records"]       = records
     db["ht_chain"]      = ht_chain
     db["ht_open"]       = ht_open
     db["ht_chain_dept"] = ht_chain_dept
     db["ht_open_dept"]  = ht_open_dept
+    db["inv_index"]     = inv_index  # thêm
 
     suggested = sample_id(records) if len(records) > 0 else "SV001"
     return {"count": len(records), "suggested_id": suggested}
@@ -127,10 +129,10 @@ def api_scenario3(req: Scenario3Req):
     if not db["records"]:
         raise HTTPException(status_code=400, detail="Load dataset first")
 
-    if req.algo == "hash":
-        return bench_s3_hash(db["ht_chain"], req.query)
-    elif req.algo == "fuzzy":
+    if req.algo == "fuzzy":
         return bench_s3_fuzzy(db["records"], req.query)
+    elif req.algo == "inverted":                                # thêm
+        return bench_s3_inverted(db["inv_index"], req.query)   # thêm
     raise HTTPException(status_code=400, detail="Invalid algo")
 
 

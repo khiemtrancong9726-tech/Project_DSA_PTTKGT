@@ -72,7 +72,7 @@ def build_hash_tables(records: list, load_factor: float = 0.5) -> tuple:
     from engine.collision.open_addressing            import OpenAddressingHashTable
     from engine.collision.chaining_multi             import ChainingMultiHashTable
     from engine.collision.open_addressing_multi      import OpenAddressingMultiHashTable
-
+    from engine.inverted_index                       import InvertedIndex  # thêm
 
     # S1 — hash theo student_id
     size     = _next_prime(int(len(records) / load_factor))
@@ -82,13 +82,18 @@ def build_hash_tables(records: list, load_factor: float = 0.5) -> tuple:
     # S2A — hash theo department_code (5 khoa cố định → size nhỏ)
     ht_chain_dept  = ChainingMultiHashTable(size=11)
     ht_open_dept   = OpenAddressingMultiHashTable(size=11)
+
     for r in records:
         ht_chain.insert(r["student_id"], r)
         ht_open.insert(r["student_id"], r)
         ht_chain_dept.insert(r["department_code"], r)
         ht_open_dept.insert(r["department_code"], r)
+    
+    # S3 — inverted index
+    inv_index = InvertedIndex(size=53)  # thêm
+    inv_index.build(records)  # thêm — build sau khi load xong
 
-    return ht_chain, ht_open, ht_chain_dept, ht_open_dept
+    return ht_chain, ht_open, ht_chain_dept, ht_open_dept, inv_index
 
 
 # Hàm lấy số nguyên tố gần nhất:
