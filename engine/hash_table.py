@@ -23,20 +23,20 @@ class HashTable:
         mỗi lần chạy → kết quả không deterministic → benchmark sai.
         """
         #Hash tối ưu:
-        #"""
+        """
         h = 0
         for char in key:
             h = (h * 31 + ord(char)) % self.size
         return h
-        #"""
+        """
 
         #Hash yếu:
-        """
+        #"""
         h = 0
         for char in key:
             h += ord(char)
         return h % self.size
-        """
+        #"""
 
     # ---- Interface bắt buộc — subclass PHẢI override ----
 

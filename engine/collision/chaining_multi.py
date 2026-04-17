@@ -8,10 +8,10 @@ class ChainingMultiHashTable(HashTable):
     Chaining Hash Table cho bài toán 1 key → nhiều value.
 
     Khác ChainingHashTable ở đúng 1 điểm:
-        insert gặp key trùng → append vào list, KHÔNG ghi đè.
+    insert gặp key trùng → append vào list, KHÔNG ghi đè.
 
-    Dùng cho Scenario 2A — key là department_code,
-    value là list tất cả record thuộc khoa đó.
+    Dùng cho Scenario 2A — key là composite "department_code_gpa",
+    value là list tất cả record thuộc cùng khoa và GPA đó.
 
     Complexity:
         insert : O(1) avg

@@ -56,8 +56,8 @@ class OpenAddressingHashTable(HashTable):
         idx = self._hash(key)
 
         # ── Chọn 1 trong 2 dòng dưới ──
-        #step = self._hash2(key)   # [B] Double Hashing
-        step = 1                # [A] Linear Probing
+        step = self._hash2(key)   # [B] Double Hashing
+        #step = 1                # [A] Linear Probing
 
         for _ in range(self.size):
             slot = self.table[idx]
@@ -83,8 +83,8 @@ class OpenAddressingHashTable(HashTable):
         idx = self._hash(key)
 
         # ── Chọn 1 trong 2 dòng dưới ──
-        #step = self._hash2(key)   # [B] Double Hashing
-        step = 1                # [A] Linear Probing
+        step = self._hash2(key)   # [B] Double Hashing
+        #step = 1                # [A] Linear Probing
 
         for _ in range(self.size):
             slot = self.table[idx]

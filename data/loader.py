@@ -75,25 +75,34 @@ def build_hash_tables(records: list, load_factor: float = 0.5) -> tuple:
     from engine.inverted_index                       import InvertedIndex  # thêm
 
     # S1 — hash theo student_id
-    size     = _next_prime(int(len(records) / load_factor))
-    ht_chain = ChainingHashTable(size=size)
-    ht_open  = OpenAddressingHashTable(size=size)
+    size_s1     = _next_prime(int(len(records) / load_factor))
+    ht_chain_s1 = ChainingHashTable(size=size_s1)
+    ht_open_s1  = OpenAddressingHashTable(size=size_s1)
 
     # S2A — hash theo department_code (5 khoa cố định → size nhỏ)
-    ht_chain_dept  = ChainingMultiHashTable(size=11)
-    ht_open_dept   = OpenAddressingMultiHashTable(size=11)
+    ht_chain_s2a  = ChainingMultiHashTable(size=11)
+    ht_open_s2a   = OpenAddressingMultiHashTable(size=11)
+
+    # S2B — hash theo gpa thuần
+    size_s2b      = _next_prime(int(401 / load_factor))
+    ht_chain_s2b  = ChainingMultiHashTable(size=size_s2b)
+    ht_open_s2b   = OpenAddressingMultiHashTable(size=size_s2b)
 
     for r in records:
-        ht_chain.insert(r["student_id"], r)
-        ht_open.insert(r["student_id"], r)
-        ht_chain_dept.insert(r["department_code"], r)
-        ht_open_dept.insert(r["department_code"], r)
+        ht_chain_s1.insert(r["student_id"], r)
+        ht_open_s1.insert(r["student_id"], r)
+
+        ht_chain_s2a.insert(r["department_code"], r)
+        ht_open_s2a.insert(r["department_code"], r)
+
+        ht_chain_s2b.insert(str(r['gpa']), r)
+        ht_open_s2b.insert(str(r['gpa']), r)
     
     # S3 — inverted index
-    inv_index = InvertedIndex(size=53)  # thêm
-    inv_index.build(records)  # thêm — build sau khi load xong
+    inv_index_s3 = InvertedIndex(size=53)  # thêm
+    inv_index_s3.build(records)  # thêm — build sau khi load xong
 
-    return ht_chain, ht_open, ht_chain_dept, ht_open_dept, inv_index
+    return ht_chain_s1, ht_open_s1, ht_chain_s2a, ht_open_s2a, ht_chain_s2b, ht_open_s2b, inv_index_s3
 
 
 # Hàm lấy số nguyên tố gần nhất:
@@ -116,5 +125,5 @@ def _next_prime(n: int) -> int:
 # ══════════════════════════════════════════════════════════════════
 
 def sample_id(records: list, index: int = 500) -> str:
-    """Lấy student_id tại vị trí index — reproducible, tránh best-case (index=0)."""
+    """Lấy student_id tại vị trí index = 500"""
     return records[min(index, len(records) - 1)]["student_id"]
