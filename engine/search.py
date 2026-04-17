@@ -8,7 +8,51 @@ Nguyên tắc thiết kế:
 - Trả về kết quả thuần, không trả tuple (result, elapsed).
 """
 
-import bisect
+# ══════════════════════════════════════════════════════════════════
+#  Binary search helpers — thay thế định nghĩa bisect_left / bisect_right
+#  Viết theo 3 pattern chuẩn
+# ══════════════════════════════════════════════════════════════════
+
+def _bisect_left(keys: list, target: float) -> int:
+    """
+    Tìm index ĐẦU TIÊN có keys[i] >= target.
+    → Pattern B: first True với condition = (keys[mid] >= target)
+
+    Complexity: O(log n)
+    """
+    left, right = 0, len(keys) - 1
+
+    while left <= right:
+        mid = (left + right) // 2
+
+        if keys[mid] >= target:   # condition True → còn tìm tiếp bên trái
+            right = mid - 1
+        else:
+            left = mid + 1
+
+    return left   # vị trí đầu tiên thỏa condition
+
+
+def _bisect_right(keys: list, target: float) -> int:
+    """
+    Tìm index CUỐI CÙNG có keys[i] <= target, rồi trả về right + 1.
+    → Pattern C: last True với condition = (keys[mid] <= target)
+
+    Slice [bisect_left : bisect_right] cho đúng range [min_gpa, max_gpa] inclusive.
+
+    Complexity: O(log n)
+    """
+    left, right = 0, len(keys) - 1
+
+    while left <= right:
+        mid = (left + right) // 2
+
+        if keys[mid] <= target:   # condition True → còn tìm tiếp bên phải
+            left = mid + 1
+        else:
+            right = mid - 1
+
+    return right + 1   # right = index cuối cùng thỏa condition → +1 để làm exclusive bound
 
 
 # ══════════════════════════════════════════════════════════════════
@@ -69,14 +113,14 @@ def linear_filter_gpa(records: list, min_gpa: float, max_gpa: float) -> list:
 
 
 def binary_filter_dept_gpa(sorted_by_gpa: list, gpa_keys: list, department: str, min_gpa: float, max_gpa: float) -> list:
-    lo = bisect.bisect_left(gpa_keys, min_gpa)
-    hi = bisect.bisect_right(gpa_keys, max_gpa)
+    lo = _bisect_left(gpa_keys, min_gpa)
+    hi = _bisect_right(gpa_keys, max_gpa)
     return [r for r in sorted_by_gpa[lo:hi] if r["department_code"] == department]
 
 
 def binary_filter_gpa(sorted_by_gpa: list, gpa_keys: list, min_gpa: float, max_gpa: float) -> list:
-    lo = bisect.bisect_left(gpa_keys, min_gpa)
-    hi = bisect.bisect_right(gpa_keys, max_gpa)
+    lo = _bisect_left(gpa_keys, min_gpa)
+    hi = _bisect_right(gpa_keys, max_gpa)
     return sorted_by_gpa[lo:hi]
 
 
