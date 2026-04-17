@@ -4,16 +4,15 @@ Scenario Layer — ráp logic đầy đủ từng thuật toán trong từng sce
 
 Nhiệm vụ:
     - Kết hợp primitive (linear, binary, hash) thành logic hoàn chỉnh
-    - Gọi benchmark._avg_ms để đo thời gian
-    - Trả về dict chuẩn để service.py chuyển lên web
+    - Gọi benchmark._avg_ms / _once_ms để đo thời gian
+    - Trả về dict chuẩn để web.py chuyển lên client
 
-Không biết request đến từ đâu — đó là việc của service.py.
+Không biết request đến từ đâu — đó là việc của web.py.
 Không implement thuật toán — đó là việc của linear.py, binary.py, collision/.
+Không tự đo thời gian — đó là việc của benchmark.py.
 """
 
-import time
-
-from engine.benchmark import _avg_ms
+from engine.benchmark import _avg_ms, _once_ms
 from engine.linear import (
     linear_search,
     linear_filter_dept_gpa,
@@ -49,9 +48,7 @@ def bench_s1_linear(records: list, target_id: str) -> dict:
 
 
 def bench_s1_binary(records: list, target_id: str) -> dict:
-    sort_start     = time.perf_counter()
-    sorted_records = sort_by_id(records)
-    sort_ms        = (time.perf_counter() - sort_start) * 1000
+    sort_ms, sorted_records = _once_ms(lambda: sort_by_id(records))
 
     ms, found = _avg_ms(lambda: binary_search(sorted_records, target_id))
     return {"algo": "Binary Search", "ms": ms, "sort_ms": sort_ms, "found": found, "failed": False}
@@ -85,9 +82,7 @@ def bench_s2a_linear(records: list, department: str, min_gpa: float, max_gpa: fl
 
 
 def bench_s2a_binary(records: list, department: str, min_gpa: float, max_gpa: float) -> dict:
-    sort_start              = time.perf_counter()
-    sorted_by_gpa, gpa_keys = sort_by_gpa(records)
-    sort_ms                 = (time.perf_counter() - sort_start) * 1000
+    sort_ms, (sorted_by_gpa, gpa_keys) = _once_ms(lambda: sort_by_gpa(records))
 
     ms, matches = _avg_ms(lambda: binary_filter_dept_gpa(sorted_by_gpa, gpa_keys, department, min_gpa, max_gpa))
     return {"algo": "Binary Filter", "ms": ms, "sort_ms": sort_ms, "match_count": len(matches), "matches": matches, "failed": False}
@@ -125,9 +120,7 @@ def bench_s2b_linear(records: list, min_gpa: float, max_gpa: float) -> dict:
 
 
 def bench_s2b_binary(records: list, min_gpa: float, max_gpa: float) -> dict:
-    sort_start              = time.perf_counter()
-    sorted_by_gpa, gpa_keys = sort_by_gpa(records)
-    sort_ms                 = (time.perf_counter() - sort_start) * 1000
+    sort_ms, (sorted_by_gpa, gpa_keys) = _once_ms(lambda: sort_by_gpa(records))
 
     ms, matches = _avg_ms(lambda: binary_filter_gpa(sorted_by_gpa, gpa_keys, min_gpa, max_gpa))
     return {"algo": "Binary Filter", "ms": ms, "sort_ms": sort_ms, "match_count": len(matches), "matches": matches, "failed": False}
