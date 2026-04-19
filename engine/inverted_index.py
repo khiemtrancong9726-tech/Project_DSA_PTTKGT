@@ -6,7 +6,7 @@ from engine.fuzzy_search import normalize
 
 class InvertedIndex:
 
-    def __init__(self, size: int = 53):  # số nguyên tố gần 48 token unique
+    def __init__(self, size: int = 97):  # next_prime(48 * 2) — 48 token unique cố định
         self.index = ChainingMultiHashTable(size=size)
 
     def build(self, records: list):

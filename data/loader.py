@@ -84,9 +84,8 @@ def build_hash_tables(records: list, load_factor: float = 0.5) -> tuple:
     ht_open_s2a   = OpenAddressingMultiHashTable(size=11)
 
     # S2B — hash theo gpa thuần
-    size_s2b      = _next_prime(int(401 / load_factor))
-    ht_chain_s2b  = ChainingMultiHashTable(size=size_s2b)
-    ht_open_s2b   = OpenAddressingMultiHashTable(size=size_s2b)
+    ht_chain_s2b = ChainingMultiHashTable(size=809)   # next_prime(401 * 2) — 401 GPA unique cố định
+    ht_open_s2b  = OpenAddressingMultiHashTable(size=809)
 
     for r in records:
         ht_chain_s1.insert(r["student_id"], r)
@@ -99,7 +98,7 @@ def build_hash_tables(records: list, load_factor: float = 0.5) -> tuple:
         ht_open_s2b.insert(str(r['gpa']), r)
     
     # S3 — inverted index
-    inv_index_s3 = InvertedIndex(size=53)  # thêm
+    inv_index_s3 = InvertedIndex(size=97)             # next_prime(48 * 2)  — 48 token unique cố định
     inv_index_s3.build(records)  # thêm — build sau khi load xong
 
     return ht_chain_s1, ht_open_s1, ht_chain_s2a, ht_open_s2a, ht_chain_s2b, ht_open_s2b, inv_index_s3
