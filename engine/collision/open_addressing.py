@@ -24,16 +24,14 @@ class OpenAddressingHashTable(HashTable):
         # ── không cần gì thêm ──
 
         # ── [B] Double Hashing — tính STEP_PRIME động theo size ──
-        self.STEP_PRIME = self._find_step_prime(self.size)
+        self.STEP_PRIME = self._find_step_prime()
 
     # ══════════════════════════════════════════════════════════════
     #  [B] Double Hashing helpers
     # ══════════════════════════════════════════════════════════════
 
-    @staticmethod
-    def _find_step_prime(size: int) -> int:
-        """Số nguyên tố lớn nhất nhỏ hơn size — dùng làm base cho h2."""
-        n = size - 1
+    def _find_step_prime(self) -> int:
+        n = self.size - 1
         while n > 1:
             if all(n % i != 0 for i in range(2, int(n**0.5) + 1)):
                 return n
@@ -56,8 +54,8 @@ class OpenAddressingHashTable(HashTable):
         idx = self._hash(key)
 
         # ── Chọn 1 trong 2 dòng dưới ──
-        step = self._hash2(key)   # [B] Double Hashing
-        #step = 1                # [A] Linear Probing
+        #step = self._hash2(key)   # [B] Double Hashing
+        step = 1                # [A] Linear Probing
 
         for _ in range(self.size):
             slot = self.table[idx]
@@ -83,8 +81,8 @@ class OpenAddressingHashTable(HashTable):
         idx = self._hash(key)
 
         # ── Chọn 1 trong 2 dòng dưới ──
-        step = self._hash2(key)   # [B] Double Hashing
-        #step = 1                # [A] Linear Probing
+        #step = self._hash2(key)   # [B] Double Hashing
+        step = 1                # [A] Linear Probing
 
         for _ in range(self.size):
             slot = self.table[idx]
