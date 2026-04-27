@@ -17,7 +17,7 @@ Tên thì không unique, không chính xác.
 # ══════════════════════════════════════════════════════════════════
 
 def normalize(text: str) -> str:
-    return text.lower()   # chỉ lowercase, không bỏ dấu
+    return text.lower()   # chỉ lowercase
 
 
 # ══════════════════════════════════════════════════════════════════
